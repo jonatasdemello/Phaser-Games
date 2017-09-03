@@ -2,22 +2,31 @@ var StateMain = {
     
     preload: function () {
         
-        // load paddle image
-        game.load.image('imgPaddle', 'img/paddle.png');
+        // moved to state_load.js
         
-        // load ball
-        game.load.image('imgBall', 'img/ball.png');
-                
-        // load bricks
-        game.load.image('imgBrickGreen', 'img/brick_green.png');
-        game.load.image('imgBrickPurple', 'img/brick_purple.png');
-        game.load.image('imgBrickRed', 'img/brick_red.png');
-        game.load.image('imgBrickYellow', 'img/brick_yellow.png');
-        
-        // add background
-        game.load.image('imgBkg', 'img/bg_blue.png');
-        game.load.image('imgBlack', 'img/bg_black.png');
-        
+//        // load paddle image
+//        game.load.image('imgPaddle', 'img/paddle.png');
+//        
+//        // load ball
+//        game.load.image('imgBall', 'img/ball.png');
+//                
+//        // load bricks
+//        game.load.image('imgBrickGreen', 'img/brick_green.png');
+//        game.load.image('imgBrickPurple', 'img/brick_purple.png');
+//        game.load.image('imgBrickRed', 'img/brick_red.png');
+//        game.load.image('imgBrickYellow', 'img/brick_yellow.png');
+//        
+//        // add background
+//        game.load.image('imgBkg', 'img/bg_blue.png');
+//        game.load.image('imgBlack', 'img/bg_black.png');
+//        
+//        
+//        // load audio
+//        game.load.audio('sfxHitBrick','snd/fx_hit_brick.wav');
+//        game.load.audio('sfxHitPaddle','snd/fx_hit_paddle.wav');
+//        game.load.audio('sfxLoseLife','snd/fx_lose_life.ogg');
+//        game.load.audio('bgmMusic','snd/bgm_electric_air.ogg');
+
         // start the physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
         // turn down the collision with the bottom of the world
@@ -26,25 +35,37 @@ var StateMain = {
         this.lives = 3;
         this.points = 0;
         
-        // load audio
-        game.load.audio('sfxHitBrick','snd/fx_hit_brick.wav');
-        game.load.audio('sfxHitPaddle','snd/fx_hit_paddle.wav');
-        game.load.audio('bgmMusic','snd/bgm_electric_air.ogg');
-        
     },
     
     create: function () {
+        
+        // for mobile
+        this.touchOldX = undefined;
+        this.touchNewX = undefined;
+        this.touchActive = false;
+        this.touchMove = 0;
         
         // add background
         var w = game.world.width;
         var h = game.world.height;
         this.bkg = game.add.tileSprite(0, 0, w, h, 'imgBkg');
         
-        
         // set the velocity X to 500px/sec
         this.paddleVelX = 500 / 1000;  // 500px/sec
         // store previous mouse position
         this.prevX = game.input.x;
+        
+        // handling the touch movement
+        if (game.device.touch && this.touchActive) {
+            
+            this.touchOldX = this.touchNewX;
+            this.touchNewX = game.input.x;
+            this.touchMove = 0;
+            if (this.touchOldX != undefined && this.touchNewX != undefined) {
+                this.touchMove = this.touchNewX - this.touchOldX;
+            }
+            this.paddle.x += this.touchMove;
+        }
         
         // add the paddle to the screen
         this.paddle = game.add.sprite(0, 0, 'imgPaddle');
@@ -96,7 +117,7 @@ var StateMain = {
         
         // JavaScript objects are passed by reference.
         var txtConfig = {
-            font: "18px sans-serif",
+            font: "18px Overlock",
             fill: "#ffffff",
             align: "right"
         };
@@ -108,12 +129,13 @@ var StateMain = {
         // audio
         this.sfxHitBrick = game.add.audio('sfxHitBrick');
         this.sfxHitPaddle = game.add.audio('sfxHitPaddle');
+        this.sfxLoseLife = game.add.audio('sfxLoseLife')
         this.bgmMusic = game.add.audio('bgmMusic');
-        
-        
+
+    
         // audio
-        this.bgmMusic.loop = true;
-        this.bgmMusic.play();
+//        this.bgmMusic.loop = true;
+//        this.bgmMusic.play();
         
         
         // Bricks
@@ -154,9 +176,26 @@ var StateMain = {
         
         // enable shoot via mouse click
         game.input.onDown.add(this.shootBall, this);
+        
+        // for mobile
+        game.input.onDown.add(this.onDown, this);
+        game.input.onUp.add(this.onUp, this);
 
+    },
 
-
+    onDown: function () {
+        
+        this.shootBall();
+        this.touchActive = true;
+        
+    },
+    
+    onUp: function () {
+        
+        this.touchOldX = undefined;
+        this.touchNewX = undefined;
+        this.touchActive = false;
+        
     },
     
     shootBall: function () {
@@ -189,7 +228,7 @@ var StateMain = {
         
         // countLiving is part of the GroupObject
         if (this.bricks.countLiving() == 0) {
-            this.gotToOver();
+            this.goToOver();
         }
         
     },
@@ -203,8 +242,10 @@ var StateMain = {
     goToOver: function () {
         
         this.bgmMusic.stop();
+        
         game.lives = this.lives;
         game.points = this.points;
+        
         game.state.start('StateOver');
     },
     
@@ -213,6 +254,8 @@ var StateMain = {
         this.resetPaddle();
         this.lives -= 1;
         this.txtLives.text = g_txtLives + this.lives;
+        
+        this.sfxLoseLife.play();
         
         console.log('Lives:' + this.lives);
         
@@ -270,6 +313,8 @@ var StateMain = {
             this.shootBall();
         }
 
+        // animate the background
+        this.bkg.tilePosition.y += 1;
 
 
     },

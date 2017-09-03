@@ -2,9 +2,16 @@ var StateOver = {
   
     preload: function () {
         
-        game.load.image('imgBkg', 'img/bg_blue.png')
-        game.load.spritesheet('btnBack', 'img/btn_back.png', 190, 49);
+        // moved to state_load.js
         
+//        game.load.image('imgBkg', 'img/bg_blue.png')
+//        game.load.spritesheet('btnBack', 'img/btn_back.png', 190, 49);
+//        
+//        game.load.audio('sfxLose','snd/fx_lose.ogg');
+//        game.load.audio('sfxWin','snd/fx_win.ogg');
+//        
+//        game.load.audio('sfxFirework','snd/fx_firework.ogg');
+//        game.load.image('imgStar','img/star.png');
     },
     
     create: function () {
@@ -45,7 +52,7 @@ var StateOver = {
         }
         
         var txtPointsConfig = {
-            font: "28px sans-serif",
+            font: "28px Overlock",
             fill: "#ffffff",
             align: "center"
         };
@@ -56,12 +63,49 @@ var StateOver = {
         txtPoints.x = game.world.centerX;
         txtPoints.y = game.world.centerY - margin;
         
+        var sfxWinLose;
+        if (lives > 0) {
+            sfxWinLose = game.add.audio('sfxWin');
+        } else {
+            sfxWinLose= game.add.audio('sfxLose');
+        }
+        sfxWinLose.play();
+        
+        if (lives > 0) {
+            this.sfxFirework = game.add.audio('sfxFirework');
+
+            var maxParticles = 100;
+            this.fireworks = game.add.emitter(0, 0, maxParticles);
+            this.fireworks.makeParticles('imgStar');
+            this.fireworks.gravity.y = 500;
+
+            this.topTime = 1;
+            this.timer = this.topTime;
+        }
+        
     },
 
     update: function () {
         
         if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
             this.goToIntro();
+        }
+        
+        if (this.lives == 0) {
+            return;
+        }
+        
+        this.timer -= game.time.physicsElapsed;
+        if (this.timer < 0) {
+            this.timer = this.topTime;
+            var randX = Math.random() * game.world.width;
+            var randY = Math.random() * game.world.height;
+            this.fireworks.x = randX;
+            this.fireworks.y = randY;
+            var duration = 800;
+            var numStars = 10;
+            this.fireworks.start(true, duration, null, numStars);
+            this.sfxFirework.play();
         }
     },
     
