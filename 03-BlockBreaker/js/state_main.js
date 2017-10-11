@@ -1,40 +1,15 @@
 var StateMain = {
     
     preload: function () {
-        
-        // moved to state_load.js
-        
-//        // load paddle image
-//        game.load.image('imgPaddle', 'img/paddle.png');
-//        
-//        // load ball
-//        game.load.image('imgBall', 'img/ball.png');
-//                
-//        // load bricks
-//        game.load.image('imgBrickGreen', 'img/brick_green.png');
-//        game.load.image('imgBrickPurple', 'img/brick_purple.png');
-//        game.load.image('imgBrickRed', 'img/brick_red.png');
-//        game.load.image('imgBrickYellow', 'img/brick_yellow.png');
-//        
-//        // add background
-//        game.load.image('imgBkg', 'img/bg_blue.png');
-//        game.load.image('imgBlack', 'img/bg_black.png');
-//        
-//        
-//        // load audio
-//        game.load.audio('sfxHitBrick','snd/fx_hit_brick.wav');
-//        game.load.audio('sfxHitPaddle','snd/fx_hit_paddle.wav');
-//        game.load.audio('sfxLoseLife','snd/fx_lose_life.ogg');
-//        game.load.audio('bgmMusic','snd/bgm_electric_air.ogg');
-
+		
         // start the physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
+		
         // turn down the collision with the bottom of the world
         game.physics.arcade.checkCollision.down = false;
         
         this.lives = 3;
         this.points = 0;
-        
     },
     
     create: function () {

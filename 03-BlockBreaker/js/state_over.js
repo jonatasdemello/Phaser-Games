@@ -1,17 +1,7 @@
 var StateOver = {
   
     preload: function () {
-        
         // moved to state_load.js
-        
-//        game.load.image('imgBkg', 'img/bg_blue.png')
-//        game.load.spritesheet('btnBack', 'img/btn_back.png', 190, 49);
-//        
-//        game.load.audio('sfxLose','snd/fx_lose.ogg');
-//        game.load.audio('sfxWin','snd/fx_win.ogg');
-//        
-//        game.load.audio('sfxFirework','snd/fx_firework.ogg');
-//        game.load.image('imgStar','img/star.png');
     },
     
     create: function () {
